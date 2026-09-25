@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Synced</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header>
+            <h1 class="logo">SYNCED</h1>
+            <p class="subtitle">
+                League of Legends Custom Matchmaking
+            </p>
+        </header>
+
+        <section class="card">
+
+            <h2>QUEUE</h2>
+
+            <div id="players"></div>
+
+            <button id="matchButton" class="match-button">
+                FIND MATCH
+            </button>
+
+        </section>
+
+        <section class="card">
+
+            <h2>MATCH</h2>
+
+            <div id="match"></div>
+
+        </section>
+
+    </main>
+
+    <script>
+
+        async function loadPlayers() {
+
+            const response = await fetch('/players');
+
+            const players = await response.json();
+
+            const playersContainer =
+                document.getElementById('players');
+
+            playersContainer.innerHTML = '';
+
+            for (const player of players) {
+
+                const playerElement =
+                    document.createElement('div');
+
+                playerElement.className = 'player';
+
+                playerElement.innerHTML = `
+                    <div class="player-name">
+                        ${player.username}
+                    </div>
+
+                    <div class="player-info">
+                        ${player.roles.join(' / ')} · ${player.elo}
+                    </div>
+                `;
+
+                playersContainer.appendChild(playerElement);
+            }
+        }
+
+        loadPlayers();
+
+
+        const matchButton =
+            document.getElementById('matchButton');
+
+
+        matchButton.addEventListener('click', async () => {
+
+            const response = await fetch('/match', {
+                method: 'POST'
+            });
+
+            const match = await response.json();
+
+            const matchContainer =
+                document.getElementById('match');
+
+            matchContainer.innerHTML = '';
+
+            if (!response.ok) {
+
+                const error =
+                    document.createElement('p');
+
+                error.className = 'error';
+
+                error.textContent = match.message;
+
+                matchContainer.appendChild(error);
+
+                return;
+            }
+
+
+            const teamsContainer =
+                document.createElement('div');
+
+            teamsContainer.className = 'teams';
+
+
+            const team1 =
+                document.createElement('div');
+
+            team1.className = 'team';
+
+            team1.innerHTML = '<h2>🔵 TEAM 1</h2>';
+
+
+            for (const player of match.team1) {
+
+                const playerElement =
+                    document.createElement('div');
+
+                playerElement.className =
+                    'team-player';
+
+                playerElement.innerHTML = `
+                    <div>
+                        ${player.username}
+                    </div>
+
+                    <div class="role">
+                        ${player.assignedRole} · ${player.elo}
+                    </div>
+                `;
+
+                team1.appendChild(playerElement);
+            }
+
+
+            const team2 =
+                document.createElement('div');
+
+            team2.className = 'team';
+
+            team2.innerHTML = '<h2>🔴 TEAM 2</h2>';
+
+
+            for (const player of match.team2) {
+
+                const playerElement =
+                    document.createElement('div');
+
+                playerElement.className =
+                    'team-player';
+
+                playerElement.innerHTML = `
+                    <div>
+                        ${player.username}
+                    </div>
+
+                    <div class="role">
+                        ${player.assignedRole} · ${player.elo}
+                    </div>
+                `;
+
+                team2.appendChild(playerElement);
+            }
+
+
+            teamsContainer.appendChild(team1);
+            teamsContainer.appendChild(team2);
+
+            matchContainer.appendChild(teamsContainer);
+
+            loadPlayers();
+
+        });
+
+    </script>
+
+</body>
+
+</html>

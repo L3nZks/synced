@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600&display=swap');
+
+/* ─── Reset & Variables ─── */
+:root {
+    --bg-deep: #0a0e1a;
+    --bg-card: rgba(20, 25, 40, 0.7);
+    --border-glow: rgba(100, 150, 255, 0.15);
+    --text-primary: #e8ecf4;
+    --text-secondary: #8b93a7;
+    --accent-blue: #00d4ff;
+    --accent-red: #ff4655;
+    --accent-gold: #c9a84c;
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(120, 80, 200, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+    background-attachment: fixed;
+}
+
+/* ─── Layout Principal ─── */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* ─── Header ─── */
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    font-weight: 500;
+}
+
+/* ─── Cards ─── */
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glow);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    opacity: 0.6;
+}
+
+.card h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--accent-gold);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+/* ─── Players List ─── */
+#players {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#players::-webkit-scrollbar {
+    width: 6px;
+}
+
+#players::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+#players::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.5);
+    border-radius: 3px;
+}
+
+.player {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.player:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
+}
+
+.player-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+.player-info {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: 'Inter', monospace;
+}
+
+/* ─── Match Button ─── */
+.match-button {
+    width: 100%;
+    padding: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: white;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+.match-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+}
+
+.match-button:active {
+    transform: translateY(0);
+}
+
+.match-button::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s;
+    opacity: 0;
+}
+
+.match-button:hover::after {
+    opacity: 1;
+    left: 100%;
+}
+
+/* ─── Match Results ─── */
+.teams {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.team {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.team h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid;
+}
+
+.team:first-child h2 {
+    color: var(--accent-blue);
+    border-color: var(--accent-blue);
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.team:last-child h2 {
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+    text-shadow: 0 0 10px rgba(255, 70, 85, 0.5);
+}
+
+.team-player {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0 8px 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.team:first-child .team-player {
+    border-left-color: var(--accent-blue);
+}
+
+.team:last-child .team-player {
+    border-left-color: var(--accent-red);
+}
+
+.team-player .role {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+}
+
+/* ─── Error Message ─── */
+.error {
+    background: rgba(255, 70, 85, 0.1);
+    border: 1px solid rgba(255, 70, 85, 0.3);
+    color: var(--accent-red);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+    .logo {
+        font-size: 2.5rem;
+    }
+    
+    .teams {
+        grid-template-columns: 1fr;
+    }
+    
+    .card {
+        padding: 1.5rem;
+    }
+}

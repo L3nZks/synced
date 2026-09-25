@@ -3,13 +3,14 @@ const { players } = require('./queue'); //Lista de jugadores
 const validRoles = ['top','jg','jungla','mid','adc','supp','support','soporte','sup','toplaner','jungler','midlaner','adcarry','supporter'];
 const validElos = ['chall','challenger','retador','grandmaster','gm','granmaestro','master','maestro','diamante','esmeralda','platino','oro','plata','bronce','hierro'];
 const { findMatch } = require('./matchmaking');
+require('dotenv').config();
 
 console.log("Iniciando bot..."); // Un mensaje para indicar cuando inicio el bot
 
 const client = new tmi.Client({ //Configuracion del cliente de tmi.
     identity: {
-        username:"Lenzks",
-        password: "oauth:x5k6wtnyl2xgcx50c4nopl2p8dcdxg"
+        username: process.env.TWITCH_USERNAME,
+        password: process.env.TWITCH_TOKEN
     },
     channels:["Lenzks"] 
 });
