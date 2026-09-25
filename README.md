@@ -1,40 +1,153 @@
-Synced
+# Synced
 
-Sistema de matchmaking para partidas personalizadas de League of Legends integrado con un bot de Twitch.
+### Sistema de matchmaking para League of Legends integrado con Twitch
 
-Synced permite que los jugadores se registren desde el chat de Twitch indicando sus roles y rango, para posteriormente formar partidas de 10 jugadores distribuidas en dos equipos de 5 con una composición válida de roles.
+Synced es un sistema de matchmaking que permite a los jugadores unirse a una cola desde el chat de Twitch y generar automáticamente partidas de 5 contra 5 teniendo en cuenta la disponibilidad de roles y el rango de los jugadores.
 
-Características
-Integración con Twitch mediante tmi.js.
-Registro de jugadores mediante comandos del chat.
-Sistema de cola de jugadores.
-Comandos !join, !leave y !match.
-Soporte para jugadores que pueden desempeñar hasta dos roles.
-Selección automática de jugadores para completar las cinco posiciones:
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat\&logo=node.js\&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat\&logo=javascript\&logoColor=black)
+![Express](https://img.shields.io/badge/Express-000000?style=flat\&logo=express\&logoColor=white)
+![Twitch](https://img.shields.io/badge/Twitch-9146FF?style=flat\&logo=twitch\&logoColor=white)
+
+---
+
+## ¿Qué es Synced?
+
+Synced conecta un bot de Twitch con una aplicación web para crear partidas personalizadas de League of Legends.
+
+Los jugadores pueden entrar a la cola directamente desde el chat utilizando comandos como:
+
+```text
+!join mid master
+!join support diamond
+!join mid support challenger
+```
+
+Cuando existen suficientes jugadores, el sistema busca una combinación válida para formar dos equipos de cinco.
+
+Un jugador puede seleccionar hasta dos roles, permitiendo que el algoritmo tenga mayor flexibilidad al momento de construir la partida.
+
+---
+
+## Funcionalidades
+
+| Funcionalidad          | Descripción                                                            |
+| ---------------------- | ---------------------------------------------------------------------- |
+| Integración con Twitch | Los jugadores interactúan con el sistema desde el chat                 |
+| Sistema de cola        | Permite entrar y salir de la cola                                      |
+| Múltiples roles        | Cada jugador puede seleccionar hasta dos posiciones                    |
+| Asignación automática  | El sistema asigna los roles según las necesidades de la partida        |
+| Backtracking           | Explora diferentes combinaciones para encontrar una composición válida |
+| Validación de equipos  | Comprueba que cada equipo tenga las cinco posiciones                   |
+| Balance de equipos     | Compara los rangos de los jugadores al crear los equipos               |
+| Interfaz web           | Permite visualizar la cola y los equipos generados                     |
+| API REST               | Conecta la lógica del servidor con la interfaz web                     |
+
+---
+
+## ¿Cómo funciona?
+
+El proyecto está dividido en varios módulos que trabajan conjuntamente:
+
+```text
+                              Twitch
+                                |
+                                v
+                              bot.js
+                                |
+                                v
+                             queue.js
+                                |
+                                v
+                         matchmaking.js
+                           /           \
+                          /             \
+                         v               v
+                      Equipo 1       Equipo 2
+                          \             /
+                           \           /
+                            +---------+
+                                |
+                                v
+                            server.js
+                                |
+                                v
+                             Frontend
+```
+
+### 1. Bot de Twitch
+
+`bot.js` se encarga de conectarse al chat de Twitch mediante `tmi.js` y procesar los comandos enviados por los jugadores.
+
+Entre los comandos disponibles se encuentran:
+
+```text
+!join
+!leave
+!match
+```
+
+### 2. Cola de jugadores
+
+`queue.js` mantiene la lista de jugadores que están esperando una partida.
+
+Cada jugador se almacena como un objeto:
+
+```js
+{
+    username: "player",
+    roles: ["mid", "support"],
+    elo: "master"
+}
+```
+
+### 3. Matchmaking
+
+`matchmaking.js` contiene la lógica principal para seleccionar los jugadores y asignarles sus roles.
+
+El sistema analiza qué jugadores pueden desempeñar cada posición y utiliza **backtracking** para probar diferentes combinaciones.
+
+Por ejemplo, un jugador que puede jugar Mid y Support puede ser asignado inicialmente a Mid. Si continuar por ese camino impide completar correctamente la composición, el algoritmo vuelve atrás y prueba otra posibilidad.
+
+Esto permite manejar situaciones en las que varios jugadores pueden ocupar la misma posición.
+
+### 4. Validación
+
+Antes de crear los equipos, el sistema comprueba que las posiciones necesarias estén cubiertas.
+
+Cada equipo debe contener:
+
+```text
 Top
 Jungle
 Mid
 ADC
 Support
-Algoritmo de búsqueda basado en backtracking para encontrar una combinación válida.
-Distribución de los jugadores en dos equipos de 5.
-Balance básico de equipos utilizando el rango de los jugadores.
-API desarrollada con Express.
-Interfaz web para visualizar la cola y los equipos generados.
-Comunicación entre el bot, el backend y el frontend mediante una cola compartida en memoria.
-Tecnologías
-Node.js
-JavaScript
-Express
-tmi.js
-HTML
-CSS
-Git / GitHub
-Arquitectura
+```
 
-El proyecto está dividido en varias partes:
+La validación evita generar composiciones con roles repetidos o posiciones sin cubrir.
 
-Synced
+### 5. Balance de equipos
+
+Una vez seleccionados los diez jugadores, el sistema evalúa distintas formas de distribuirlos entre los dos equipos.
+
+Para realizar un balance básico, cada rango tiene un valor:
+
+```text
+Diamond      = 1
+Master       = 2
+Grandmaster  = 3
+Challenger   = 4
+```
+
+El sistema compara el valor total de ambos equipos y busca una distribución válida con la menor diferencia posible.
+
+---
+
+## Estructura del proyecto
+
+```text
+Synced/
 │
 ├── app.js
 ├── bot.js
@@ -46,121 +159,152 @@ Synced
 │   ├── index.html
 │   └── style.css
 │
+├── .env.example
+├── .gitignore
 ├── package.json
 ├── package-lock.json
-└── .gitignore
-Bot de Twitch
+└── README.md
+```
 
-bot.js se encarga de conectarse al chat de Twitch y procesar los comandos enviados por los jugadores.
+### Responsabilidad de cada archivo
 
-Ejemplos:
+| Archivo          | Función                                               |
+| ---------------- | ----------------------------------------------------- |
+| `app.js`         | Inicia el bot y el servidor                           |
+| `bot.js`         | Conexión con Twitch y procesamiento de comandos       |
+| `queue.js`       | Almacena la cola de jugadores                         |
+| `matchmaking.js` | Selección de jugadores, asignación de roles y balance |
+| `server.js`      | API de Express y servidor de la aplicación web        |
+| `public/`        | Interfaz del proyecto                                 |
 
-!join mid master
-!join mid support diamond
-!leave
-!match
-Cola
+---
 
-queue.js contiene la lista de jugadores que están esperando una partida.
+## API
 
-Cada jugador se representa con información como:
+El servidor Express proporciona los siguientes endpoints:
 
-{
-    username: "player",
-    roles: ["mid", "support"],
-    elo: "master"
-}
-Matchmaking
+| Método | Endpoint   | Descripción                                 |
+| ------ | ---------- | ------------------------------------------- |
+| `GET`  | `/`        | Comprueba que el servidor esté funcionando  |
+| `GET`  | `/players` | Devuelve los jugadores que están en la cola |
+| `POST` | `/match`   | Intenta generar una partida                 |
 
-matchmaking.js contiene la lógica principal para construir las partidas.
+---
 
-El algoritmo debe encontrar una combinación de jugadores que permita cubrir las cinco posiciones en cada equipo.
+## Ejemplo del proceso
 
-Para resolver los casos donde existen jugadores con múltiples roles, se utiliza backtracking. El algoritmo prueba diferentes asignaciones y vuelve atrás cuando una combinación no puede completarse.
+Un ejemplo sencillo del flujo sería:
 
-Una vez encontrados 10 jugadores válidos, se evalúan diferentes distribuciones para crear dos equipos con una diferencia de rango lo más pequeña posible.
+```text
+1. Los jugadores entran desde Twitch
+                ↓
+2. Se almacenan en la cola
+                ↓
+3. El sistema analiza los roles disponibles
+                ↓
+4. Se buscan 10 jugadores compatibles
+                ↓
+5. Se asignan las posiciones mediante backtracking
+                ↓
+6. Se valida la composición
+                ↓
+7. Se generan dos equipos
+                ↓
+8. Se comparan los rangos
+                ↓
+9. Se muestran los equipos en la interfaz
+```
 
-API
+---
 
-server.js utiliza Express para proporcionar una API sencilla.
+## Tecnologías utilizadas
 
-Endpoints principales:
+* **Node.js** — ejecución del backend
+* **JavaScript** — lógica de la aplicación
+* **Express** — servidor y API REST
+* **tmi.js** — integración con Twitch
+* **HTML** — estructura de la interfaz
+* **CSS** — estilos de la interfaz
+* **Git / GitHub** — control de versiones
 
-GET  /
-GET  /players
-POST /match
+---
 
-El frontend utiliza estos endpoints para consultar la cola y solicitar una partida.
+## Ejecución local
 
-Flujo del proyecto
-Jugador
-   │
-   ▼
-Chat de Twitch
-   │
-   ▼
-bot.js
-   │
-   ▼
-queue.js
-   │
-   ▼
-matchmaking.js
-   │
-   ├── Selección de jugadores
-   ├── Asignación de roles
-   ├── Validación de composición
-   └── Balance de equipos
-   │
-   ▼
-server.js
-   │
-   ▼
-Frontend
-Objetivo del proyecto
+Instala las dependencias del proyecto:
 
-El proyecto fue desarrollado como una forma práctica de aprender y aplicar conceptos de desarrollo de software, incluyendo:
-
-JavaScript con Node.js.
-Desarrollo de APIs con Express.
-Integración con servicios externos.
-Manejo de estructuras de datos.
-Algoritmos de búsqueda y backtracking.
-Modularización del código.
-Comunicación entre backend y frontend.
-Uso de Git y GitHub.
-Limitaciones actuales
-
-Synced es actualmente un proyecto basado en memoria, por lo que la información de la cola se pierde cuando el servidor se reinicia.
-
-Actualmente no cuenta con:
-
-Base de datos.
-Sistema de cuentas de usuario.
-Historial de partidas.
-MMR avanzado.
-Sistema de autenticación propio.
-Persistencia de jugadores.
-
-Estas características podrían incorporarse en futuras versiones.
-
-Ejecución local
-
-Instalar las dependencias:
-
+```bash
 npm install
+```
 
-Configurar las credenciales de Twitch mediante variables de entorno.
+Configura las credenciales de Twitch mediante variables de entorno.
 
-Después ejecutar:
+Después ejecuta:
 
+```bash
 node app.js
+```
 
-El servidor estará disponible en:
+La aplicación web estará disponible en:
 
+```text
 http://localhost:3000
-Estado
+```
 
-Proyecto funcional en versión MVP.
+Las credenciales no deben almacenarse directamente en el código fuente. El proyecto incluye un `.env.example` como referencia y `.env` se encuentra excluido mediante `.gitignore`.
 
-Desarrollado como proyecto personal para practicar desarrollo backend, algoritmos, integración con APIs y construcción de aplicaciones web.
+---
+
+## Lo que aprendí con este proyecto
+
+Este proyecto fue desarrollado como una forma práctica de aplicar y entender conceptos de desarrollo de software.
+
+Entre los principales conceptos trabajados están:
+
+* Organización y modularización de una aplicación Node.js
+* Desarrollo de una API REST con Express
+* Integración con un servicio externo mediante Twitch
+* Manejo de objetos y estructuras de datos
+* Uso de arrays, `filter`, `map`, `sort` y `Set`
+* Algoritmos de búsqueda
+* Backtracking y recursividad
+* Validación de datos
+* Comunicación entre backend y frontend
+* Uso de Git y GitHub
+
+---
+
+## Limitaciones actuales
+
+La cola de jugadores se almacena únicamente en memoria. Esto significa que los jugadores desaparecen de la cola cuando el servidor se reinicia.
+
+Actualmente el proyecto no incluye:
+
+* Base de datos
+* Cuentas de usuario
+* Historial de partidas
+* Estadísticas de jugadores
+* Sistema avanzado de MMR
+* Persistencia de datos
+
+---
+
+## Posibles mejoras
+
+Entre las características que podrían incorporarse en futuras versiones están:
+
+* Persistencia mediante una base de datos
+* Historial de partidas
+* Estadísticas de jugadores
+* Sistema de MMR más avanzado
+* Actualizaciones de la cola en tiempo real
+* Autenticación de usuarios
+* Mejoras en el algoritmo de matchmaking
+
+---
+
+## Estado del proyecto
+
+**Versión:** MVP
+
+Synced es un proyecto personal desarrollado para practicar integración con servicios externos, desarrollo backend, algoritmos de búsqueda y construcción de aplicaciones web.
